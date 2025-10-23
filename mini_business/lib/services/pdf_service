@@ -1,0 +1,23 @@
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
+Future<void> generateClientListPdf(List clients) async {
+  final pdf = pw.Document();
+
+  pdf.addPage(
+    pw.Page(
+      build: (pw.Context context) => pw.Column(
+        children: clients
+            .map((c) => pw.Text("${c.name} - ${c.email}"))
+            .toList(),
+      ),
+    ),
+  );
+
+  final dir = await getApplicationDocumentsDirectory();
+  final file = File("${dir.path}/clients.pdf");
+  await file.writeAsBytes(await pdf.save());
+  print("Saved PDF: ${file.path}");
+}
