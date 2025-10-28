@@ -4,15 +4,11 @@ import 'services/db_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // initialize DB and run a one-time migration from SharedPreferences
+  // initialize DB (SQLite) - no JSON/SharedPreferences migration
   try {
-    final db = DBService();
-    await db.database; // ensure DB is created and ready
-    final res = await db.migrateFromSharedPreferences(clearAfter: false);
-    debugPrint('Migration result: $res');
+    await DBService().database; // ensure DB is created and ready
   } catch (e) {
-    debugPrint('Migration error: $e');
+    debugPrint('DB initialization error: $e');
   }
 
   runApp(const MyApp());

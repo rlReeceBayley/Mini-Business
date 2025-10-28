@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/client.dart';
-import '../services/db_service.dart';
 
 class AddClientScreen extends StatefulWidget {
   final Client? client;

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../models/stock.dart';
 import '../settings/settings_service.dart';
@@ -181,7 +180,7 @@ class _StockScreenState extends State<StockScreen>  {
                                 const SizedBox(width: 8),
                                 Expanded(flex:1 , child: Text(item.cost.toString(), overflow: TextOverflow.ellipsis,)),
                                 const SizedBox(width: 8),
-                                Expanded(flex:1 , child: Text(item.price.toString(), overflow: TextOverflow.ellipsis,)),
+                                Expanded(flex:1 , child: Text(item.variations.toString(), overflow: TextOverflow.ellipsis,)),
                                 const SizedBox(width: 8),
                               ],),),
                           )
