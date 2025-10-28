@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'services/db_service.dart';
+import 'local_server.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +11,13 @@ void main() async {
   } catch (e) {
     debugPrint('DB initialization error: $e');
   }
+  try {
+    await startLocalServer(); // runs in background
+
+  } catch (e){
+    debugPrint('server initialization error: $e');
+  }
+
 
   runApp(const MyApp());
 }

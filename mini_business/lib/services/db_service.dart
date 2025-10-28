@@ -42,6 +42,13 @@ class DBService {
     );
   }
 
+  /// Return the file path used for the SQLite database. Useful for external
+  /// tools or scripts that want to open the same database file directly.
+  static Future<String> databaseFilePath() async {
+    final dbPath = await getDatabasesPath();
+    return join(dbPath, 'mini_business.db');
+  }
+
   Future<void> _onCreate(Database db, int version) async {
     // clients
     await db.execute('''
