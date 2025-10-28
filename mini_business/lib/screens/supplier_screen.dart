@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../models/client.dart';
+import '../models/supplier.dart';
 import '../services/db_service.dart';
-import 'add_client.dart';
+import 'add_supplier.dart';
 
-class ClientScreen extends StatefulWidget {
-  const ClientScreen({super.key});
+class SupplierScreen extends StatefulWidget {
+  const SupplierScreen({super.key});
 
   @override
-  State<ClientScreen> createState() => _ClientScreenState();
+  State<SupplierScreen> createState() => _SupplierScreenState();
 }
 
-class _ClientScreenState extends State<ClientScreen> {
-  List<Client> clients = [];
+class _SupplierScreenState extends State<SupplierScreen> {
+  List<Supplier> suppliers = [];
   bool loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadClients();
+    _loadSuppliers();
   }
 
-  Future<void> _loadClients() async {
+  Future<void> _loadSuppliers() async {
     try {
       final db = DBService();
-      clients = await db.getClients();
+      suppliers = await db.getSuppliers();
     } catch (e) {
-      debugPrint('Error loading clients from DB: $e');
+      debugPrint('Error loading suppliers from DB: $e');
     } finally {
       setState(() {
         loading = false;
@@ -37,57 +37,57 @@ class _ClientScreenState extends State<ClientScreen> {
 
   
 
-  Future<void> _addClient() async {
-    final created = await Navigator.push<Client?>(
+  Future<void> _addSupplier() async {
+    final created = await Navigator.push<Supplier?>(
       context,
-      MaterialPageRoute(builder: (_) => const AddClientScreen()),
+      MaterialPageRoute(builder: (_) => const AddSupplierScreen()),
     );
     if (created != null) {
       try {
         final db = DBService();
-        final id = await db.insertClient(created);
+        final id = await db.insertSupplier(created);
         created.id = id;
         setState(() {
-          clients.add(created);
+          suppliers.add(created);
         });
       } catch (e) {
-        debugPrint('Error inserting client into DB: $e');
+        debugPrint('Error inserting supplier into DB: $e');
       }
     }
   }
 
-  Future<void> _editClient(int index) async {
-    final edited = await Navigator.push<Client?>(
+  Future<void> _editSupplier(int index) async {
+    final edited = await Navigator.push<Supplier?>(
       context,
-      MaterialPageRoute(builder: (_) => AddClientScreen(client: clients[index])),
+      MaterialPageRoute(builder: (_) => AddSupplierScreen(supplier: suppliers[index])),
     );
     if (edited != null) {
       try {
         final db = DBService();
-        final id = clients[index].id;
+        final id = suppliers[index].id;
         if (id != null) {
-          await db.updateClient(id, edited);
+          await db.updateSupplier(id, edited);
           edited.id = id;
         }
         setState(() {
-          clients[index] = edited;
+          suppliers[index] = edited;
         });
       } catch (e) {
-        debugPrint('Error updating client in DB: $e');
+        debugPrint('Error updating supplier in DB: $e');
       }
     }
   }
 
-  Future<void> _deleteClient(int index) async {
+  Future<void> _deleteSupplier(int index) async {
     try {
       final db = DBService();
-      final id = clients[index].id;
-      if (id != null) await db.deleteClient(id);
+      final id = suppliers[index].id;
+      if (id != null) await db.deleteSupplier(id);
     } catch (e) {
-      debugPrint('Error deleting client from DB: $e');
+      debugPrint('Error deleting supplier from DB: $e');
     }
     setState(() {
-      clients.removeAt(index);
+      suppliers.removeAt(index);
     });
   }
 
@@ -96,9 +96,9 @@ class _ClientScreenState extends State<ClientScreen> {
     if (loading) return const Center(child: CircularProgressIndicator());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Clients')),
+      appBar: AppBar(title: const Text('Suppliers')),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addClient,
+        onPressed: _addSupplier,
         child: const Icon(Icons.add),
       ),
       body: Column(
@@ -112,24 +112,22 @@ class _ClientScreenState extends State<ClientScreen> {
                 SizedBox(width: 8),
                 Expanded(flex: 3, child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold))),
                 SizedBox(width: 8),
-                Expanded(flex: 1, child: Text('Number', style: TextStyle(fontWeight: FontWeight.bold))),
-                SizedBox(width: 8),
-                Expanded(flex: 1, child: Text('Pricing', style: TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(flex: 1, child: Text('Phone', style: TextStyle(fontWeight: FontWeight.bold))),
                 SizedBox(width: 8),
                 Expanded(flex: 1, child: Text('Account', style: TextStyle(fontWeight: FontWeight.bold))),
               ],
             ),
           ),
           Expanded(
-            child: clients.isEmpty
-                ? const Center(child: Text('No clients saved'))
+            child: suppliers.isEmpty
+                ? const Center(child: Text('No suppliers saved'))
                 : ListView.separated(
-                    itemCount: clients.length,
+                    itemCount: suppliers.length,
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, index) {
-                      final client = clients[index];
+                      final supplier = suppliers[index];
                       return Dismissible(
-                        key: ValueKey(client.hashCode + index),
+                        key: ValueKey(supplier.hashCode + index),
                         // Allow swiping both ways; we'll handle actions in confirmDismiss
                         direction: DismissDirection.horizontal,
                         // Left swipe (endToStart) - delete
@@ -149,30 +147,28 @@ class _ClientScreenState extends State<ClientScreen> {
                         confirmDismiss: (direction) async {
                           if (direction == DismissDirection.endToStart) {
                             // delete
-                            await _deleteClient(index);
+                            await _deleteSupplier(index);
                             return true; // allow dismissal (removes the widget)
                           } else if (direction == DismissDirection.startToEnd) {
                             // edit - open editor and do NOT dismiss
-                            await _editClient(index);
+                            await _editSupplier(index);
                             return false; // do not dismiss
                           }
                           return false;
                         },
                         child: InkWell(
-                          onTap: () => _editClient(index),
+                          onTap: () => _editSupplier(index),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                             child: Row(
                               children: [
-                                Expanded(flex: 2, child: Text(client.name, overflow: TextOverflow.ellipsis)),
+                                Expanded(flex: 2, child: Text(supplier.name, overflow: TextOverflow.ellipsis)),
                                 const SizedBox(width: 8),
-                                Expanded(flex: 3, child: Text(client.email, overflow: TextOverflow.ellipsis)),
+                                Expanded(flex: 3, child: Text(supplier.email, overflow: TextOverflow.ellipsis)),
                                 const SizedBox(width: 8),
-                                Expanded(flex: 1, child: Text(client.number.toString())),
+                                Expanded(flex: 1, child: Text(supplier.number.toString())),
                                 const SizedBox(width: 8),
-                                Expanded(flex: 1, child: Text(client.pricing, overflow: TextOverflow.ellipsis)),
-                                const SizedBox(width: 8),
-                                Expanded(flex: 1, child: Text(client.account, overflow: TextOverflow.ellipsis)),
+                                Expanded(flex: 1, child: Text(supplier.account, overflow: TextOverflow.ellipsis)),
                               ],
                             ),
                           ),

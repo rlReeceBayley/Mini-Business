@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'client_screen.dart';
+import 'supplier_screen.dart';
+import 'stock_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -56,7 +58,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 35),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                          setState(() => _fabOpen = false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const StockScreen()),
+                          );},
                     child: const Text('Stock'),
                   ),
                 ),
@@ -127,7 +134,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       FloatingActionButton.small(
                         heroTag: 'suppliers',
-                        onPressed: () {},
+                        onPressed: () {
+                          setState(() => _fabOpen = false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SupplierScreen()),
+                          );
+                        },
                         tooltip: 'Suppliers',
                         child: const Icon(Icons.store),
                       ),
@@ -145,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: const Icon(Icons.inventory),
                       ),
                       const SizedBox(height: 6),
-                      const Text('Goods', style: TextStyle(fontSize: 12)),
+                      const Text('Receiving', style: TextStyle(fontSize: 12)),
                     ],
                   ),
                   const SizedBox(height: 8),

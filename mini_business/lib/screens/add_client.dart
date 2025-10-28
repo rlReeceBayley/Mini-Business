@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/client.dart';
+import '../services/db_service.dart';
 
 class AddClientScreen extends StatefulWidget {
   final Client? client;
@@ -33,7 +34,7 @@ class _AddClientScreenState extends State<AddClientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Add Client")),
+      appBar: AppBar(title: const Text("Client")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -67,10 +68,9 @@ class _AddClientScreenState extends State<AddClientScreen> {
               onPressed: () {
                 final parsedNumber = int.tryParse(numberCtrl.text.trim()) ?? 0;
                 if (nameCtrl.text.isNotEmpty) {
-                  Navigator.pop(
-                    context,
-                    Client(accountCtrl.text, nameCtrl.text, emailCtrl.text, parsedNumber, selectedOption ?? ''),
-                  );
+                  // preserve id when editing
+                  final returned = Client(accountCtrl.text, nameCtrl.text, emailCtrl.text, parsedNumber, selectedOption ?? '', id: widget.client?.id);
+                  Navigator.pop(context, returned);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter a name')));
                 }
