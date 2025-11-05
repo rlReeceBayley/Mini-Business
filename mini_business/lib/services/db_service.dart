@@ -35,11 +35,12 @@ class DBService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'mini_business.db');
 
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
+      return await openDatabase(
+        path,
+        version: 2,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      );
   }
 
   /// Return the file path used for the SQLite database. Useful for external
@@ -56,9 +57,12 @@ class DBService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
         email TEXT,
+        address TEXT,
         number INTEGER,
         account TEXT,
-        pricing TEXT
+        pricing TEXT,
+          term TEXT,
+          vat INTEGER
       )
     ''');
 
@@ -97,6 +101,24 @@ class DBService {
         value TEXT
       )
     ''');
+  }
+
+  /// Handle DB upgrades. When moving from version 1 -> 2 we need to add
+  /// the `term` and `vat` columns to the `clients` table.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      try {
+        await db.execute('ALTER TABLE clients ADD COLUMN term TEXT');
+      } catch (e) {
+        // ignore if column already exists or other problems; log for visibility
+        print('Warning: could not add term column during upgrade: $e');
+      }
+      try {
+        await db.execute('ALTER TABLE clients ADD COLUMN vat INTEGER');
+      } catch (e) {
+        print('Warning: could not add vat column during upgrade: $e');
+      }
+    }
   }
 
   // ------- Clients CRUD -------

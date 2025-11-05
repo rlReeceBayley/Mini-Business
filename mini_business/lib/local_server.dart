@@ -26,7 +26,7 @@ Future<void> startLocalServer() async {
   // GET /clients
   app.get('/clients', (Request request) {
     try {
-      final results = db.select('SELECT id, name, email, number, pricing FROM clients');
+      final results = db.select('SELECT id, name, email, number, pricing, term FROM clients');
       final data = results
           .map((row) => {
                 'id': row['id'],
@@ -34,6 +34,7 @@ Future<void> startLocalServer() async {
                 'email': row['email'],
                 'number': row['number'],
                 'pricing': row['pricing'],
+                'term': row['term'],
               })
           .toList();
       return Response.ok(jsonEncode(data), headers: {
@@ -114,7 +115,7 @@ Future<void> startLocalServer() async {
     ''', headers: {'Content-Type': 'text/html'});
   });
 
-  final server = await io.serve(app, InternetAddress.anyIPv4, 8080);
+  final server = await io.serve(app.call, InternetAddress.anyIPv4, 8080);
   print('✅ Server running on http://${server.address.host}:${server.port}');
 }
 
